@@ -38,7 +38,7 @@ async fn get_user() -> Result<Json<User>, StatusCode> { // Changed the return ty
 
 #[tokio::main]
 async fn main() {
-    // tracing_subscriber::fmt::init();
+    
 
     let app = Router::new()
         .route("/user/getUser", get(get_user))
@@ -46,6 +46,21 @@ async fn main() {
 
     println!("server running on port 3000");
 
-    let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
-    axum::serve(listener, app).await.unwrap();
+    let listener_res = tokio::net::TcpListener::bind("0.0.0.0:3000").await;
+    let listener = match listener_res {
+        Ok(listener)=> listener,
+        Err(err)=>{
+            println!("{}",err);
+            return 
+        }
+    };
+    let server = axum::serve(listener, app).await;
+    match server {
+        Ok(server)=>server,
+        Err(err)=> {
+            
+            println!("{}",err);
+            return
+        }
+    }
 }
